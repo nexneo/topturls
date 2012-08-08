@@ -50,7 +50,7 @@ type Tweet struct {
 }
 
 type SearchResult struct {
-	Page       int     `json:"page"`
+	Page       uint    `json:"page"`
 	Query      string  `json:"query"`
 	Results    []Tweet `json:"results"`
 	SinceIdStr string  `json:"since_id_str"`
