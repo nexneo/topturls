@@ -29,7 +29,7 @@ type Mention struct {
 
 type Tweet struct {
 	Entities struct {
-		MediaList []Media   `json:"media"`
+		MediaList Urls      `json:"media"`
 		Urls      Urls      `json:"urls"`
 		Mentions  []Mention `json:"user_mentions"`
 	}
@@ -66,10 +66,11 @@ func (self Urls) String() string {
 
 func (self Tweet) String() string {
 	ret := fmt.Sprintf(
-		"(%v)\n%v\n%v",
+		"(%v)\n%v\n%v%v",
 		self.FromUserName,
 		self.Text,
 		self.Entities.Urls,
+		self.Entities.MediaList,
 	)
 	return strings.Trim(ret, "\n ")
 }
