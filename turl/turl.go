@@ -21,14 +21,6 @@ type Media struct {
 
 type Urls []Media
 
-func (self Urls) String() string {
-	var urls []string
-	for i := 0; i < len(self); i++ {
-		urls = append(urls, self[i].ExpandedUrl)
-	}
-	return strings.Join(urls, "\n")
-}
-
 type Mention struct {
 	IdStr      string `json:"id_str"`
 	Name       string `json:"name"`
@@ -46,12 +38,30 @@ type Tweet struct {
 	}
 	CreatedAt       string `json:"created_at"`
 	FromUser        string `json:"from_user"`
-	FromUserId      int    `json:"from_user_id"`
+	FromUserId      uint64 `json:"from_user_id"`
 	FromUserIdStr   string `json:"from_user_id_str"`
 	FromUserName    string `json:"from_user_name"`
+	Id              uint64 `json:"id"`
 	IdStr           string `json:"id_str"`
-	IsoLanguageCode string `json:"iso_language_code"`
+	ProfileImageUrl string `json:"profile_image_url"`
+	Source          string `json:"source"`
 	Text            string `json:"text"`
+	ToUserIdStr     string `json:"to_user_id_str"`
+}
+
+type SearchResult struct {
+	Page       int     `json:"page"`
+	Query      string  `json:"query"`
+	Results    []Tweet `json:"results"`
+	SinceIdStr string  `json:"since_id_str"`
+}
+
+func (self Urls) String() string {
+	var urls []string
+	for i := 0; i < len(self); i++ {
+		urls = append(urls, self[i].ExpandedUrl)
+	}
+	return strings.Join(urls, "\n")
 }
 
 func (self Tweet) String() string {
@@ -62,17 +72,6 @@ func (self Tweet) String() string {
 		self.Entities.Urls,
 	)
 	return strings.Trim(ret, "\n ")
-}
-
-type SearchResult struct {
-	MaxIdStr       string  `json:"max_id_str"`
-	NextPage       string  `json:"next_page"`
-	Page           int     `json:"page"`
-	Query          string  `json:"query"`
-	RefreshUrl     string  `json:"refresh_url"`
-	Results        []Tweet `json:"results"`
-	ResultsPerPage int     `json:"results_per_page"`
-	SinceIdStr     string  `json:"since_id_str"`
 }
 
 // Return tweets for query
