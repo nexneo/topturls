@@ -2,10 +2,12 @@
 package main
 
 import (
+	//"code.google.com/p/gorilla/mux"
 	"flag"
-	"fmt"
 	"github.com/nexneo/topturls/turl"
+	"html/template"
 	"log"
+	"os"
 )
 
 var (
@@ -18,12 +20,21 @@ func init() {
 }
 
 func main() {
+	tpl, err := template.New("tweet").Parse(tweetTpl)
 	tweets, err := turl.SearchTweets(search)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	for _, tweet := range tweets {
-		fmt.Println(tweet, "\n")
+		tpl.Execute(os.Stdout, tweet)
 	}
 }
+
+const (
+	tweetTpl = `
+({{.FromUserName}})
+{{.Text}}
+{{range .Entities.Urls}}{{.ExpandedUrl}}{{end}}
+`
+)

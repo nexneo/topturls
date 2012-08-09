@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type Media struct {
@@ -57,34 +56,12 @@ type SearchResult struct {
 	SinceIdStr string  `json:"since_id_str"`
 }
 
-func (urls Urls) String() string {
-	var ret []string
-	for _, u := range urls {
-		ret = append(ret, u.ExpandedUrl)
-	}
-	return strings.Join(ret, "\n")
-}
-
-func (tweet Tweet) String() string {
-	ret := fmt.Sprintf(
-		"(%v)\n%v\n%v%v",
-		tweet.FromUserName,
-		tweet.Text,
-		tweet.Entities.Urls,
-		tweet.Entities.MediaList,
-	)
-	return strings.Trim(ret, "\n ")
-}
-
 // Return tweets for query
-//		Example queries:
-// 			"Niket"
-// 			"Breaking News"
 func SearchTweets(query string) ([]Tweet, error) {
 	var tweets []Tweet
 	var err error
 	// fetch search response from twitter
-	search := "http://search.twitter.com/searcd.json?%s"
+	search := "http://search.twitter.com/search.json?%s"
 	params := url.Values{
 		"q":                {query},
 		"include_entities": {"true"},
