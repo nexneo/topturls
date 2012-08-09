@@ -22,7 +22,7 @@ func main() {
 		log.Fatal(err)
 		return
 	}
-	for i := 0; i < len(tweets); i++ {
-		fmt.Println(tweets[i], "\n")
+	for _, tweet := range tweets {
+		fmt.Println(tweet, "\n")
 	}
 }

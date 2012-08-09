@@ -79,27 +79,29 @@ func (self Tweet) String() string {
 //		Example queries:
 // 			"Niket"
 // 			"Breaking News"
-func SearchTweets(query string) (tweets []Tweet, err error) {
+func SearchTweets(query string) ([]Tweet, error) {
+	var tweets []Tweet
+	var err error
 	// fetch search response from twitter
 	search := "http://search.twitter.com/search.json?%v"
 	params := url.Values{
 		"q":                []string{query},
 		"include_entities": []string{"true"},
-		"geocode":          []string{"51.5171,0.1062,100mi"},
+		"geocode":          []string{"37.33182,122.03118,100mi"},
 	}
 	search = fmt.Sprintf(search, params.Encode())
 
 	// Get search response
 	response, err := http.Get(search)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer response.Body.Close()
 
 	// on fail return immediately 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	// obj is wrapper map around results array of tweets
@@ -108,5 +110,5 @@ func SearchTweets(query string) (tweets []Tweet, err error) {
 
 	tweets = obj.Results
 
-	return
+	return tweets, nil
 }
