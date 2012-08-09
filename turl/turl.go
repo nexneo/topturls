@@ -2,6 +2,7 @@ package turl
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -56,21 +57,21 @@ type SearchResult struct {
 	SinceIdStr string  `json:"since_id_str"`
 }
 
-func (self Urls) String() string {
-	var urls []string
-	for i := 0; i < len(self); i++ {
-		urls = append(urls, self[i].ExpandedUrl)
+func (urls Urls) String() string {
+	var ret []string
+	for _, u := range urls {
+		ret = append(ret, u.ExpandedUrl)
 	}
-	return strings.Join(urls, "\n")
+	return strings.Join(ret, "\n")
 }
 
-func (self Tweet) String() string {
+func (tweet Tweet) String() string {
 	ret := fmt.Sprintf(
 		"(%v)\n%v\n%v%v",
-		self.FromUserName,
-		self.Text,
-		self.Entities.Urls,
-		self.Entities.MediaList,
+		tweet.FromUserName,
+		tweet.Text,
+		tweet.Entities.Urls,
+		tweet.Entities.MediaList,
 	)
 	return strings.Trim(ret, "\n ")
 }
@@ -83,11 +84,11 @@ func SearchTweets(query string) ([]Tweet, error) {
 	var tweets []Tweet
 	var err error
 	// fetch search response from twitter
-	search := "http://search.twitter.com/search.json?%v"
+	search := "http://search.twitter.com/searcd.json?%s"
 	params := url.Values{
-		"q":                []string{query},
-		"include_entities": []string{"true"},
-		"geocode":          []string{"37.33182,122.03118,100mi"},
+		"q":                {query},
+		"include_entities": {"true"},
+		"geocode":          {"37.33182,122.03118,100mi"},
 	}
 	search = fmt.Sprintf(search, params.Encode())
 
@@ -97,6 +98,11 @@ func SearchTweets(query string) ([]Tweet, error) {
 		return nil, err
 	}
 	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		status := fmt.Sprintf(": %s", response.Status)
+		return nil, errors.New(status)
+	}
 
 	// on fail return immediately 
 	body, err := ioutil.ReadAll(response.Body)
