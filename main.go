@@ -20,13 +20,15 @@ func init() {
 }
 
 func main() {
+	results := make(chan turl.Tweet, 1)
+	go turl.SearchTweets(results, search)
 	tpl, err := template.New("tweet").Parse(tweetTpl)
-	tweets, err := turl.SearchTweets(search)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	for _, tweet := range tweets {
+	log.Println("Searching...", search)
+	for tweet := range results {
 		tpl.Execute(os.Stdout, tweet)
 	}
 }

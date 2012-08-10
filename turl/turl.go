@@ -57,8 +57,7 @@ type SearchResult struct {
 }
 
 // Return tweets for query
-func SearchTweets(query string) ([]Tweet, error) {
-	var tweets []Tweet
+func SearchTweets(results chan Tweet, query string) {
 	var err error
 	// fetch search response from twitter
 	search := "http://search.twitter.com/search.json?%s"
@@ -72,26 +71,27 @@ func SearchTweets(query string) ([]Tweet, error) {
 	// Get search response
 	response, err := http.Get(search)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		status := fmt.Sprintf(": %s", response.Status)
-		return nil, errors.New(status)
+		panic(errors.New(status))
 	}
 
 	// on fail return immediately 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	// obj is wrapper map around results array of tweets
 	var obj SearchResult
 	json.Unmarshal(body, &obj)
 
-	tweets = obj.Results
-
-	return tweets, nil
+	for _, tweet := range obj.Results{
+		results <- tweet
+	}
+	close(results)
 }
