@@ -3,7 +3,6 @@ package main
 
 import (
 	"code.google.com/p/gorilla/mux"
-	"flag"
 	"github.com/nexneo/topturls/turl"
 	"go/build"
 	"html/template"
@@ -30,15 +29,11 @@ var (
 	tweetH = TweetHandler{Action("tweet.html")}
 	searcH = SearchHandler{Action("index.html")}
 	tpl    *template.Template
-	search string
 	tweets turl.Tweets
 	router *mux.Router
 )
 
 func init() {
-	flag.StringVar(&search, "q", "Olympics", "pass query with q")
-	flag.Parse()
-
 	p, err := build.Default.Import(basePkg, "", build.FindOnly)
 	if err != nil {
 		log.Fatalf("Couldn't find staic: %v", err)
@@ -60,8 +55,10 @@ func (handler IndexHandler) ServeHTTP(response http.ResponseWriter,
 	req *http.Request) {
 
 	results := make(chan turl.Tweet, 100)
+	search := "Olympics"
 	go turl.SearchTweets(results, search)
 
+	tweets = make(turl.Tweets, 0)
 	for tweet := range results {
 		tweets = append(tweets, tweet)
 	}
@@ -80,7 +77,7 @@ func (handler SearchHandler) ServeHTTP(response http.ResponseWriter,
 	req *http.Request) {
 	//find tweet
 	results := make(chan turl.Tweet, 100)
-	search = req.FormValue("query")
+	search := req.FormValue("query")
 	go turl.SearchTweets(results, search)
 
 	tweets = make(turl.Tweets, 0)
