@@ -1,0 +1,15 @@
+<div class="row-fluid">
+  <div class="span10">
+    <h3>Tweets for </h3>
+    <ul class="unstyled">
+      {{range .}}
+        <li>
+          {{template "tweet-row.html" .}}
+          <br />
+        </li>
+      {{end}}
+    </ul>
+  </div>
+</div>
+
+

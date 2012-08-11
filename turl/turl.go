@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -49,11 +50,22 @@ type Tweet struct {
 	ToUserIdStr     string `json:"to_user_id_str"`
 }
 
+type Tweets []Tweet
+
 type SearchResult struct {
 	Page       uint    `json:"page"`
 	Query      string  `json:"query"`
 	Results    []Tweet `json:"results"`
 	SinceIdStr string  `json:"since_id_str"`
+}
+
+func (tweets Tweets) Find(idstr string) (tweet Tweet) {
+	for _, tweet = range tweets {
+		if tweet.IdStr == idstr {
+			break
+		}
+	}
+	return
 }
 
 // Return tweets for query
@@ -64,33 +76,32 @@ func SearchTweets(results chan Tweet, query string) {
 	params := url.Values{
 		"q":                {query},
 		"include_entities": {"true"},
-		"geocode":          {"37.33182,122.03118,100mi"},
 	}
 	search = fmt.Sprintf(search, params.Encode())
 
 	// Get search response
 	response, err := http.Get(search)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		status := fmt.Sprintf(": %s", response.Status)
-		panic(errors.New(status))
+		log.Fatal(errors.New(status))
 	}
 
 	// on fail return immediately 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// obj is wrapper map around results array of tweets
 	var obj SearchResult
 	json.Unmarshal(body, &obj)
 
-	for _, tweet := range obj.Results{
+	for _, tweet := range obj.Results {
 		results <- tweet
 	}
 	close(results)
