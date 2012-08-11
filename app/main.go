@@ -13,9 +13,6 @@ const basePkg = "github.com/nexneo/topturls"
 
 type Action string
 
-type IndexHandler struct {
-	A Action
-}
 type TweetHandler struct {
 	A Action
 }
@@ -24,7 +21,6 @@ type SearchHandler struct {
 }
 
 var (
-	indexH = IndexHandler{Action("index.html")}
 	tweetH = TweetHandler{Action("tweet.html")}
 	searcH = SearchHandler{Action("index.html")}
 	tpl    *template.Template
@@ -42,27 +38,12 @@ func init() {
 	tpl = template.Must(template.ParseGlob(templatePath))
 
 	router = mux.NewRouter()
-	router.Handle("/", indexH)
+	router.Handle("/", searcH)
 	router.Handle("/tweet/{id}", tweetH)
 	router.Handle("/search", searcH)
 
 	http.Handle("/", router)
 	http.Handle("/public/", http.FileServer(http.Dir(rootPath)))
-}
-
-func (handler IndexHandler) ServeHTTP(response http.ResponseWriter,
-	req *http.Request) {
-
-	results := make(chan turl.Tweet, 100)
-	search := "Olympics"
-	go turl.SearchTweets(results, search)
-
-	tweets = make(turl.Tweets, 0)
-	for tweet := range results {
-		tweets = append(tweets, tweet)
-	}
-
-	handler.A.Render(response, tweets)
 }
 
 func (handler TweetHandler) ServeHTTP(response http.ResponseWriter,
@@ -77,6 +58,9 @@ func (handler SearchHandler) ServeHTTP(response http.ResponseWriter,
 	//find tweet
 	results := make(chan turl.Tweet, 100)
 	search := req.FormValue("query")
+	if search == "" {
+		search = "Olympics"
+	}
 	go turl.SearchTweets(results, search)
 
 	tweets = make(turl.Tweets, 0)
