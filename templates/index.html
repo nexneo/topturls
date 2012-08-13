@@ -1,8 +1,9 @@
 <div class="row-fluid">
   <div class="span10">
-    <h3>Tweets for </h3>
+    <h3>Search : {{.query}}</h3>
+    <br />
     <ul class="unstyled">
-      {{range .}}
+      {{range .tweets}}
         <li>
           {{template "tweet-row.html" .}}
           <br />
@@ -11,5 +12,3 @@
     </ul>
   </div>
 </div>
-
-

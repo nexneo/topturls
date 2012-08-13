@@ -3,6 +3,6 @@ package main
 
 import "github.com/nexneo/topturls/app"
 
-func main(){
-app.Start()
+func main() {
+	app.Start()
 }

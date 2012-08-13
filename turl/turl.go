@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -48,6 +47,8 @@ type Tweet struct {
 	Source          string `json:"source"`
 	Text            string `json:"text"`
 	ToUserIdStr     string `json:"to_user_id_str"`
+	
+	Query string
 }
 
 type Tweets []Tweet
@@ -55,7 +56,7 @@ type Tweets []Tweet
 type SearchResult struct {
 	Page       uint    `json:"page"`
 	Query      string  `json:"query"`
-	Results    []Tweet `json:"results"`
+	Tweets    Tweets `json:"results"`
 	SinceIdStr string  `json:"since_id_str"`
 }
 
@@ -69,40 +70,44 @@ func (tweets Tweets) Find(idstr string) (tweet Tweet) {
 }
 
 // Return tweets for query
-func SearchTweets(results chan Tweet, query string) {
+func SearchTweets(query string) (Tweets, error) {
 	var err error
 	// fetch search response from twitter
-	search := "http://search.twitter.com/search.json?%s"
+	searchURL := "http://search.twitter.com/search.json?%s"
 	params := url.Values{
 		"q":                {query},
 		"include_entities": {"true"},
 	}
-	search = fmt.Sprintf(search, params.Encode())
+	searchURL = fmt.Sprintf(searchURL, params.Encode())
 
 	// Get search response
-	response, err := http.Get(search)
+	response, err := http.Get(searchURL)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		status := fmt.Sprintf(": %s", response.Status)
-		log.Fatal(errors.New(status))
+		return nil, errors.New(status)
 	}
 
 	// on fail return immediately 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	// obj is wrapper map around results array of tweets
-	var obj SearchResult
-	json.Unmarshal(body, &obj)
+	var result SearchResult
+	var tweets Tweets
 
-	for _, tweet := range obj.Results {
-		results <- tweet
+	json.Unmarshal(body, &result)
+	
+	for _, tweet := range result.Tweets {
+		tweet.Query = result.Query
+		tweets = append(tweets, tweet)
 	}
-	close(results)
+
+	return tweets, nil
 }
