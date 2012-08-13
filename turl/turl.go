@@ -47,17 +47,17 @@ type Tweet struct {
 	Source          string `json:"source"`
 	Text            string `json:"text"`
 	ToUserIdStr     string `json:"to_user_id_str"`
-	
+
 	Query string
 }
 
 type Tweets []Tweet
 
 type SearchResult struct {
-	Page       uint    `json:"page"`
-	Query      string  `json:"query"`
-	Tweets    Tweets `json:"results"`
-	SinceIdStr string  `json:"since_id_str"`
+	Page       uint   `json:"page"`
+	Query      string `json:"query"`
+	Tweets     Tweets `json:"results"`
+	SinceIdStr string `json:"since_id_str"`
 }
 
 func (tweets Tweets) Find(idstr string) (tweet Tweet) {
@@ -88,7 +88,7 @@ func SearchTweets(query string) (Tweets, error) {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		status := fmt.Sprintf(": %s", response.Status)
+		status := fmt.Sprintf(": %s \n%s", response.Status, searchURL)
 		return nil, errors.New(status)
 	}
 
@@ -98,12 +98,11 @@ func SearchTweets(query string) (Tweets, error) {
 		return nil, err
 	}
 
-	// obj is wrapper map around results array of tweets
 	var result SearchResult
 	var tweets Tweets
 
 	json.Unmarshal(body, &result)
-	
+
 	for _, tweet := range result.Tweets {
 		tweet.Query = result.Query
 		tweets = append(tweets, tweet)

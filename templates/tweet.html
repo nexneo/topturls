@@ -1,6 +1,6 @@
 <div class="row-fluid">
   <div class="span10">
     {{template "tweet-row.html" .tweet}}
-    {{template "url-list.html" .Entities.Urls}}
+    {{template "url-list.html" .tweet.Entities.Urls}}
   </div>
 </div>
