@@ -1,6 +1,14 @@
 <div class="row-fluid">
-  <div class="span10">
-    {{template "tweet-row.html" .tweet}}
-    {{template "url-list.html" .tweet.Entities.Urls}}
+  {{with .tweet}}
+  <div class="span1">
+  	<a href="" class="thumbnail">
+  		<img src="{{.ProfileImageUrl}}" height="48" width="48"/>
+  	</a>
   </div>
+  <div class="span7">
+    {{template "tweet-row.html" .}}
+    {{template "url-list.html" .Entities.Urls}}
+	{{template "url-list.html" .Entities.MediaList}}
+  </div>
+  {{end}}
 </div>

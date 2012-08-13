@@ -1,7 +1,13 @@
 <ul class="unstyled">
-  {{range .}}
-  <li>
-    <a href="{{.ExpandedUrl}}">{{.Url}}</a>
-  </li>
-  {{end}}
+	{{range .}}
+	<li>
+		{{if .IsPhoto}}
+			<a href="{{.ExpandedUrl}}" class="thumbnail" >
+				<img src="{{.MediaUrl}}" />
+			</a>
+		{{else}}
+			<a href="{{.ExpandedUrl}}">{{.ExpandedUrl}}</a>
+		{{end}}
+	</li>
+	{{end}}
 </ul>

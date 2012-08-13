@@ -60,6 +60,10 @@ type SearchResult struct {
 	SinceIdStr string `json:"since_id_str"`
 }
 
+func (media Media) IsPhoto() bool {
+	return media.Type == "photo"
+}
+
 func (tweets Tweets) Find(idstr string) (tweet Tweet) {
 	for _, tweet = range tweets {
 		if tweet.IdStr == idstr {
