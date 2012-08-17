@@ -1,18 +1,19 @@
 package app
+
 import (
 	"code.google.com/p/gorilla/mux"
 	"net/http"
 )
 
-var(
+var (
 	router *mux.Router
 )
 
-func routerSetup(){
+func routerSetup() {
 	router = mux.NewRouter()
-	router.Handle("/", indexHandler)
-	router.Handle("/tweet/{id}", showHandler)
-	router.Handle("/search", indexHandler)
+	router.HandleFunc("/", indexHandler)
+	router.HandleFunc("/tweet/{id}", showHandler)
+	router.HandleFunc("/search", indexHandler)
 
 	http.Handle("/", router)
 	http.Handle("/public/", http.FileServer(http.Dir(rootPath)))

@@ -5,23 +5,13 @@ import (
 	"net/http"
 )
 
-type Action string
-
-type ShowHandler struct {
-	Action
-}
-type IndexHandler struct {
-	Action
+func render(t string, response http.ResponseWriter, context interface{}) {
+	tpl.Lookup(t).Execute(response, context)
 }
 
-var (
-	showHandler  = ShowHandler{Action("tweet.html")}
-	indexHandler = IndexHandler{Action("index.html")}
-)
-
-func (handler ShowHandler) ServeHTTP(response http.ResponseWriter,
+func showHandler(response http.ResponseWriter,
 	req *http.Request) {
-	
+
 	//find tweet
 	query := req.URL.Query().Get("query")
 	id := mux.Vars(req)["id"]
@@ -31,10 +21,10 @@ func (handler ShowHandler) ServeHTTP(response http.ResponseWriter,
 		"tweet": tweet,
 		"query": query,
 	}
-	handler.Render(response, renderContext)
+	render("tweet.html", response, renderContext)
 }
 
-func (handler IndexHandler) ServeHTTP(response http.ResponseWriter,
+func indexHandler(response http.ResponseWriter,
 	req *http.Request) {
 	//find tweet
 	query := req.FormValue("query")
@@ -47,5 +37,5 @@ func (handler IndexHandler) ServeHTTP(response http.ResponseWriter,
 		"tweets": tweets,
 		"query":  query,
 	}
-	handler.Render(response, renderContext)
+	render("index.html", response, renderContext)
 }

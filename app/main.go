@@ -9,7 +9,6 @@ import (
 
 const basePkg = "github.com/nexneo/topturls"
 
-
 var (
 	tpl      *template.Template
 	rootPath string
